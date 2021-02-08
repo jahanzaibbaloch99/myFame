@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MyFame</string>
+    <string name="facebook_app_id">1789404021241347</string>
+<string name="fb_login_protocol_scheme">fb1789404021241347</string>
+</resources>
