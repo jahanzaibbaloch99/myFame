@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:602721606207:android:5487191117a2ab31d8768a",
+        "mobilesdk_app_id": "1:602721606207:android:2cc30fbad94229b3d8768a",
         "android_client_info": {
-          "package_name": "com.myfameapp"
+          "package_name": "com.myfamevideoapp"
         }
       },
       "oauth_client": [
