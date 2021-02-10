@@ -1,19 +1,26 @@
-import Auth from "@react-native-firebase/auth"
+import Auth from '@react-native-firebase/auth';
 export const SinginCreater = async (email, password) => {
-    await Auth().signInWithEmailAndPassword(email,password).then((data) => {
-        console.log(data , 'Data')
-        return data
-    }).catch((e) => {
-        console.log(e)
-        return e
-    })
+  try {
+    const Res = await Auth()
+      .signInWithEmailAndPassword(email, password)
+      .then((ele) => {
+          return JSON.parse(ele.user)
+      });
+    return Res;
+  } catch (e) {
+    return e;
+  }
 };
 
-export const SignupCreater = async (email,password) => {
-    await Auth().createUserWithEmailAndPassword(email,password).then((data ) => {
-        console.log(data , "DATA")
-        return data
-    }).catch((e) => {
-        console.log(e,"E")
-    })
-}
+export const SignupCreater = async (email, password) => {
+  try {
+    const Res = await Auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then((ele) => {
+        return JSON.parse(ele.user)
+    });
+    return Res;
+  } catch (e) {
+    return e;
+  }
+};

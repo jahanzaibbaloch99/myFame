@@ -6,22 +6,23 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {SinginCreater} from '../Utils/Firebase/Auth'
+import {useDispatch} from 'react-redux';
+import {SigninExisting} from '../Store/Actions/Auth';
 const Signin = (props) => {
-  const [email,setEmail] = React.useState("");
-const [password,setPassword] = React.useState("");
+  const dispatch = useDispatch();
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
-const emailOnChange = (e) => {
-  console.log(e , "E")
-  setEmail(e)
-}
-const OnPasswordChange = (e) => {
-  setPassword(e)
-}
-const singInAccount = async() => {
-  const SignData = await SinginCreater(email,password)
-  console.log(SignData, "DAtaSign")
-}
+  const emailOnChange = (e) => {
+    console.log(e, 'E');
+    setEmail(e);
+  };
+  const OnPasswordChange = (e) => {
+    setPassword(e);
+  };
+  const singInAccount = async () => {
+    dispatch(SigninExisting({email, password}));
+  };
   return (
     <SafeAreaView style={{flex: 1}}>
       <View
