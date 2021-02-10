@@ -12,9 +12,9 @@ import {SafeAreaView, StyleSheet} from 'react-native';
 import StackNavigation from './Src/Stacknavigator/Stacknavigator';
 const App = () => {
   return (
-    <SafeAreaView>
+    <>
       <StackNavigation />
-    </SafeAreaView>
+    </>
   );
 };
 

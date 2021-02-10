@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Signin from '../Screens/SignIn';
@@ -11,9 +11,9 @@ const StackNavigation = (props) => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-          <Stack.Screen name="Onboard" component={Onboarding} options={{headerShown:true}} />
-          <Stack.Screen name="Signin" component={Signin} />
-          <Stack.Screen name="Signup" component={Signup}/>
+        <Stack.Screen name="Onboard" component={Onboarding} />
+        <Stack.Screen name="Signin" component={Signin} />
+        <Stack.Screen name="Signup" component={Signup} />
       </Stack.Navigator>
     </NavigationContainer>
   );
