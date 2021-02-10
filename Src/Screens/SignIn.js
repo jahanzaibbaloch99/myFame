@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-
+import {SinginCreater} from '../Utils/Firebase/Auth'
 const Signin = (props) => {
   const [email,setEmail] = React.useState("");
 const [password,setPassword] = React.useState("");
@@ -17,6 +17,10 @@ const emailOnChange = (e) => {
 }
 const OnPasswordChange = (e) => {
   setPassword(e)
+}
+const singInAccount = async() => {
+  const SignData = await SinginCreater(email,password)
+  console.log(SignData, "DAtaSign")
 }
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -72,6 +76,7 @@ const OnPasswordChange = (e) => {
             height: '5%',
           }}>
           <TouchableOpacity
+            onPress={singInAccount}
             style={{
               borderRadius: 10,
               height: '100%',
