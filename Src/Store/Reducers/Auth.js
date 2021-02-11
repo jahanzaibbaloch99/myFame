@@ -1,34 +1,34 @@
 const initialState = {
-  data: "",
+  data: '',
   loading: false,
-  userLoading: false,
+  error: false,
   accessToken: null,
   authToken: null,
 };
 export default (state = initialState, actions) => {
   switch (actions.type) {
-    case "STATE_UPDATE":
+    case 'STATE_UPDATE':
       return {
         ...state,
         ...actions.payload,
       };
-    case "UPDATE_TOKENS":
+    case 'UPDATE_TOKENS':
       return {
         ...state,
         ...actions.payload,
       };
-    case "ASYNC_STORAGE_TOKEN":
+    case 'ASYNC_STORAGE_TOKEN':
       return {
         ...state,
         ...actions.payload,
       };
 
-    case "LINKEDINREF":
+    case 'LINKEDINREF':
       return {
         ...state,
         linkedinRef: actions.payload,
       };
-    case "LOGOUT":
+    case 'LOGOUT':
       return {
         ...initialState,
       };

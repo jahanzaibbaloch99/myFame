@@ -6,18 +6,23 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-
+import {useDispatch} from 'react-redux';
+import {SigninExisting} from '../Store/Actions/Auth';
 const Signin = (props) => {
-  const [email,setEmail] = React.useState("");
-const [password,setPassword] = React.useState("");
+  const dispatch = useDispatch();
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
-const emailOnChange = (e) => {
-  console.log(e , "E")
-  setEmail(e)
-}
-const OnPasswordChange = (e) => {
-  setPassword(e)
-}
+  const emailOnChange = (e) => {
+    console.log(e, 'E');
+    setEmail(e);
+  };
+  const OnPasswordChange = (e) => {
+    setPassword(e);
+  };
+  const singInAccount = async () => {
+    dispatch(SigninExisting({email, password}));
+  };
   return (
     <SafeAreaView style={{flex: 1}}>
       <View
@@ -72,6 +77,7 @@ const OnPasswordChange = (e) => {
             height: '5%',
           }}>
           <TouchableOpacity
+            onPress={singInAccount}
             style={{
               borderRadius: 10,
               height: '100%',
