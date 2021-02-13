@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   View,
-  Text,
-  TouchableOpacity,
   StyleSheet,
   Dimensions,
 } from 'react-native';
@@ -19,12 +17,32 @@ const Onboard = (props) => {
         alignContent: 'center',
         alignItems: 'center',
       }}>
-      <TouchableOpacity style={{marginVertical: 10}}>
-        <Text>FACEBOOK</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={{marginVertical: 10}}>
-        <Text>Twitters</Text>
-      </TouchableOpacity>
+      <Button
+        buttonText="Facebook"
+        viewStyle={{
+          backgroundColor: '#3b5998',
+          marginTop: '12%',
+           width: width / 1.1,
+           height: 47,
+           alignItems: 'center',
+           justifyContent: 'center',
+           borderRadius: 90,
+        }} />
+      
+      <Button
+        buttonText="Twitter"
+        viewStyle={{
+          backgroundColor: '#1DA1F2',
+    marginTop: '12%',
+    width: width / 1.1,
+    height: 47,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 90,
+        }}
+        textStyle={styles.joinEnticeBtnText}
+        onPress={() => props.navigation.navigate('Signup')}
+      />
       <Button
         buttonText="Join MyFame"
         viewStyle={styles.joinEnticeBtn}
