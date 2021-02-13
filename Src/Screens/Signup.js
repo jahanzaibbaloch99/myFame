@@ -6,7 +6,8 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {SignupCreater} from "../Utils/Firebase/Auth";
+import {useDispatch} from 'react-redux';
+import {SignupCreater, SinginCreater} from '../Utils/Firebase/Auth';
 const Signup = (props) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -17,10 +18,9 @@ const Signup = (props) => {
   const OnPasswordChange = (e) => {
     setPassword(e);
   };
-  const singupAccount = async() => {
-    const SignData = await SignupCreater(email,password)
-    console.log(SignData, "DAtaSign")
-  }
+  const singupAccount = async () => {
+    useDispatch(SinginCreater({email, password}));
+  };
   return (
     <SafeAreaView style={{flex: 1}}>
       <View
@@ -75,7 +75,7 @@ const Signup = (props) => {
             height: '5%',
           }}>
           <TouchableOpacity
-          onPress={singupAccount}
+            onPress={singupAccount}
             style={{
               borderRadius: 10,
               height: '100%',
