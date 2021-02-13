@@ -21,7 +21,7 @@ const Signin = (props) => {
     setPassword(e);
   };
   const singInAccount = async () => {
-    dispatch(SinginCreater({email,password}))
+    dispatch(SinginCreater(email,password))
     // dispatch(SigninExisting({email, password}));
   };
   return (

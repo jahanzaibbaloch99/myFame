@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
-import {SignupCreater, SinginCreater} from '../Utils/Firebase/Auth';
+import {SignupCreater} from '../Utils/Firebase/Auth';
 const Signup = (props) => {
+  const dispatch = useDispatch();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -19,7 +20,7 @@ const Signup = (props) => {
     setPassword(e);
   };
   const singupAccount = async () => {
-    useDispatch(SinginCreater({email, password}));
+    dispatch(SignupCreater(email, password));
   };
   return (
     <SafeAreaView style={{flex: 1}}>
