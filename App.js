@@ -8,15 +8,16 @@
 
 import React from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
-
+import {useSelector} from 'react-redux';
 import StackNavigation from './Src/Stacknavigator/Stacknavigator';
 const App = () => {
+  const Auth = useSelector((state) => state.Auth);
+  console.log(Auth, 'AUTH');
   return (
     <>
       <StackNavigation />
     </>
   );
 };
-
 
 export default App;

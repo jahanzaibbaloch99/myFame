@@ -7,6 +7,11 @@ const initialState = {
 };
 export default (state = initialState, actions) => {
   switch (actions.type) {
+    case 'SIGN_IN':
+      return {
+        ...state,
+        ...actions.payload,
+      };
     case 'STATE_UPDATE':
       return {
         ...state,
