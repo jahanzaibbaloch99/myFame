@@ -14,6 +14,7 @@ export const SinginCreater = (email, password) => {
           console.log(ele, 'ELEE<M');
           return ele;
         });
+        console.log(Res,"RES")
       const userData = await fireStore()
         .collection('Users')
         .doc(Res.user.uid)
@@ -114,9 +115,10 @@ export const SignupCreater = (email, password) => {
             loading: false,
             AuthToken: TokenData,
             AccessToken: TokenData,
+            UserData:{userId:Res.user.uid}
           },
         });
-      }
+      
       dispatch({
         type: 'SIGN_IN',
         payload: {

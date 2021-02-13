@@ -5,6 +5,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Button from "../Components/Commmon/Button"
+import { LoginButton, AccessToken } from 'react-native-fbsdk';
 
 const {height, width} = Dimensions.get('window');
 const Onboard = (props) => {
@@ -17,17 +18,25 @@ const Onboard = (props) => {
         alignContent: 'center',
         alignItems: 'center',
       }}>
-      <Button
-        buttonText="Facebook"
-        viewStyle={{
-          backgroundColor: '#3b5998',
-          marginTop: '12%',
-           width: width / 1.1,
-           height: 47,
-           alignItems: 'center',
-           justifyContent: 'center',
-           borderRadius: 90,
-        }} />
+      <View>
+        <LoginButton
+          onLoginFinished={
+            (error, result) => {
+              if (error) {
+                console.log("login has error: " +  error);
+              } else if (result.isCancelled) {
+                console.log("login is cancelled.");
+              } else {
+                AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    console.log(data.accessToken.toString())
+                  }
+                )
+              }
+            }
+          }
+          onLogoutFinished={() => console.log("logout.")}/>
+      </View>
       
       <Button
         buttonText="Twitter"
