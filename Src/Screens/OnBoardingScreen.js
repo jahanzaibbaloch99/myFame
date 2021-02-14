@@ -32,9 +32,10 @@ const Onboard = (props) => {
         .then((snap) => {
           console.log(snap.user, 'USER');
           AsyncStorage.setItem('AuthToken', data.accessToken);
-          return snap;
+          console.log(snap.user , "USERRR")
+          return snap.user;
         });
-      console.log(Authentic.then((ele) => ele), 'AITH');
+      console.log(Authentic, 'AITH');
       await fireStore().collection('Users').doc(Authentic.uid).set({
         email: 'email',
         createdAt: firebase.firestore.Timestamp.now(),
