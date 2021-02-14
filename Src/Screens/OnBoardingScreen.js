@@ -1,14 +1,61 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import Button from "../Components/Commmon/Button"
-import { LoginButton, AccessToken } from 'react-native-fbsdk';
+import {View, StyleSheet, Dimensions} from 'react-native';
+import Button from '../Components/Commmon/Button';
+import {LoginManager, AccessToken} from 'react-native-fbsdk';
+import auth, {firebase} from '@react-native-firebase/auth';
+import {useState} from 'react';
+import {useDispatch} from 'react-redux';
+import fireStore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {height, width} = Dimensions.get('window');
 const Onboard = (props) => {
+  const dispatch = useDispatch();
+  const [facebookToken, setFacebookToken] = React.useState('');
+  const onFacebookLogin = async () => {
+    const result = await LoginManager.logInWithPermissions([
+      'public_profile',
+      'email',
+    ]);
+    if (result.isCancelled) {
+      console.log('CANCEL');
+    }
+    const data = await AccessToken.getCurrentAccessToken();
+    if (data) {
+      console.log(data, 'DATAAAAA ');
+      const faceBookCrediental = auth.FacebookAuthProvider.credential(
+        data.accessToken,
+      );
+      console.log(faceBookCrediental, 'FACEBOOK');
+      const Authentic = auth()
+        .signInWithCredential(faceBookCrediental)
+        .then((snap) => {
+          console.log(snap.user, 'USER');
+          AsyncStorage.setItem('AuthToken', data.accessToken);
+          return snap;
+        });
+      console.log(Authentic.then((ele) => ele), 'AITH');
+      await fireStore().collection('Users').doc(Authentic.uid).set({
+        email: 'email',
+        createdAt: firebase.firestore.Timestamp.now(),
+        firstName: '',
+        lastName: '',
+        userName: '',
+        userId: Authentic.uid,
+        ImageUrl: '',
+      });
+      dispatch({
+        type: 'SIGN_IN',
+        payload: {
+          loading: false,
+          AuthToken: data.accessToken,
+          AccessToken: data.accessToken,
+          UserData: {userId: Authentic.uid},
+        },
+      });
+      console.log(Authentic);
+    }
+  };
   return (
     <View
       style={{
@@ -18,36 +65,31 @@ const Onboard = (props) => {
         alignContent: 'center',
         alignItems: 'center',
       }}>
-      <View>
-        <LoginButton
-          onLoginFinished={
-            (error, result) => {
-              if (error) {
-                console.log("login has error: " +  error);
-              } else if (result.isCancelled) {
-                console.log("login is cancelled.");
-              } else {
-                AccessToken.getCurrentAccessToken().then(
-                  (data) => {
-                    console.log(data.accessToken.toString())
-                  }
-                )
-              }
-            }
-          }
-          onLogoutFinished={() => console.log("logout.")}/>
-      </View>
-      
+      <Button
+        buttonText="Facebook"
+        viewStyle={{
+          backgroundColor: '#1DA1F2',
+          marginTop: '12%',
+          width: width / 1.1,
+          height: 47,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 90,
+        }}
+        textStyle={styles.joinEnticeBtnText}
+        onPress={() => onFacebookLogin()}
+      />
+
       <Button
         buttonText="Twitter"
         viewStyle={{
           backgroundColor: '#1DA1F2',
-    marginTop: '12%',
-    width: width / 1.1,
-    height: 47,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 90,
+          marginTop: '12%',
+          width: width / 1.1,
+          height: 47,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 90,
         }}
         textStyle={styles.joinEnticeBtnText}
         onPress={() => props.navigation.navigate('Signup')}

@@ -14,24 +14,23 @@ export const SinginCreater = (email, password) => {
           console.log(ele, 'ELEE<M');
           return ele;
         });
-        console.log(Res,"RES")
+      console.log(Res, 'RES');
       const userData = await fireStore()
         .collection('Users')
         .doc(Res.user.uid)
         .get()
         .then((snapShot) => {
-          console.log(snapShot.data(), 'SNA');
-          return snapShot.data;
+          return snapShot.data();
         });
       if (userData.userName !== undefined) {
         await Auth()
           .currentUser.getIdTokenResult()
           .then((data) => {
             console.log(data, 'TOKEN');
-            AsyncStorage.setItem('AuthToken', data);
+            AsyncStorage.setItem('AuthToken', data.token);
             dispatch({
               type: 'SIGN_IN',
-              payload: {loading: false, AuthToken: data, AccessToken: null},
+              payload: {loading: false, AuthToken: data.token, AccessToken: null},
             });
           });
       } else {
@@ -115,16 +114,17 @@ export const SignupCreater = (email, password) => {
             loading: false,
             AuthToken: TokenData,
             AccessToken: TokenData,
-            UserData:{userId:Res.user.uid}
+            UserData: {userId: Res.user.uid},
           },
         });
-      
-      dispatch({
-        type: 'SIGN_IN',
-        payload: {
-          loading: false,
-        },
-      });
+
+        dispatch({
+          type: 'SIGN_IN',
+          payload: {
+            loading: false,
+          },
+        });
+      }
     } catch (e) {
       console.log(e, 'Ee');
       dispatch({
