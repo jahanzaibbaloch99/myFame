@@ -1,9 +1,9 @@
 const initialState = {
-  data: '',
+  UserData: {},
   loading: false,
   error: false,
-  accessToken: null,
-  authToken: null,
+  AccessToken: null,
+  AuthToken: null,
 };
 export default (state = initialState, actions) => {
   switch (actions.type) {

@@ -13,7 +13,7 @@ import {
 import {Modalize} from 'react-native-modalize';
 import {useDispatch} from 'react-redux';
 import {FloatingLabelInput} from 'react-native-floating-label-input';
-
+import Button from '../Components/Commmon/Button';
 var ImagePicker = NativeModules.ImageCropPicker;
 
 const Introduction = (props) => {
@@ -158,7 +158,7 @@ const Introduction = (props) => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Ionicons name="camera-outline" size={30} color="grey" />
+              {/* <Ionicons name="camera-outline" size={30} color="grey" /> */}
             </View>
           </TouchableOpacity>
           <View style={{marginTop: '5%', width: '60%', marginLeft: '3%'}}>
@@ -281,7 +281,6 @@ const Introduction = (props) => {
               buttonText="Finish"
               viewStyle={styles.nextBtn}
               textStyle={styles.nextBtnText}
-              onPress={navigateTonext}
             />
           </View>
         </View>
