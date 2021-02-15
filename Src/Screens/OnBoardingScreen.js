@@ -3,7 +3,6 @@ import {View, StyleSheet, Dimensions} from 'react-native';
 import Button from '../Components/Commmon/Button';
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
 import auth, {firebase} from '@react-native-firebase/auth';
-import {useState} from 'react';
 import {useDispatch} from 'react-redux';
 import fireStore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,39 +11,50 @@ const {height, width} = Dimensions.get('window');
 const Onboard = (props) => {
   const dispatch = useDispatch();
   const [facebookToken, setFacebookToken] = React.useState('');
+  const [fbloading, setLoading] = React.useState(false);
   const onFacebookLogin = async () => {
+    setLoading(true);
     const result = await LoginManager.logInWithPermissions([
       'public_profile',
       'email',
     ]);
     if (result.isCancelled) {
+      setLoading(false);
       console.log('CANCEL');
     }
     const data = await AccessToken.getCurrentAccessToken();
     if (data) {
-      console.log(data, 'DATAAAAA ');
       const faceBookCrediental = auth.FacebookAuthProvider.credential(
         data.accessToken,
       );
-      console.log(faceBookCrediental, 'FACEBOOK');
       const Authentic = auth()
         .signInWithCredential(faceBookCrediental)
         .then((snap) => {
-          console.log(snap.user, 'USER');
           AsyncStorage.setItem('AuthToken', data.accessToken);
-          console.log(snap.user , "USERRR")
-          return snap.user;
+          return snap;
+        })
+        .then((data) => {
+          return data;
         });
-      console.log(Authentic, 'AITH');
-      await fireStore().collection('Users').doc(Authentic.uid).set({
-        email: 'email',
-        createdAt: firebase.firestore.Timestamp.now(),
-        firstName: '',
-        lastName: '',
-        userName: '',
-        userId: Authentic.uid,
-        ImageUrl: '',
-      });
+      console.log(Authentic.user, 'AITH');
+      const UserData = auth().currentUser;
+      console.log(
+        UserData.displayName + Math.random(110 * 2).toFixed(),
+        'USERS DATA',
+      );
+      setLoading(false);
+      await fireStore()
+        .collection('Users')
+        .doc(UserData.uid)
+        .set({
+          email: UserData.email,
+          createdAt: firebase.firestore.Timestamp.now(),
+          firstName: UserData.displayName,
+          lastName: '',
+          userName: UserData.displayName + Math.random(110 * 2).toFixed(),
+          userId: UserData.uid,
+          ImageUrl: '',
+        });
       dispatch({
         type: 'SIGN_IN',
         payload: {
@@ -54,7 +64,6 @@ const Onboard = (props) => {
           UserData: {userId: Authentic.uid},
         },
       });
-      console.log(Authentic);
     }
   };
   return (
@@ -79,8 +88,8 @@ const Onboard = (props) => {
         }}
         textStyle={styles.joinEnticeBtnText}
         onPress={() => onFacebookLogin()}
+        loader={fbloading}
       />
-
       <Button
         buttonText="Twitter"
         viewStyle={{

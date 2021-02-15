@@ -4,6 +4,8 @@ const initialState = {
   error: false,
   AccessToken: null,
   AuthToken: null,
+  SigupLoading: false,
+  SignInLoading: false,
 };
 export default (state = initialState, actions) => {
   switch (actions.type) {

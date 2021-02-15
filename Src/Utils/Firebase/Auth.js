@@ -1,11 +1,12 @@
 import Auth, {firebase} from '@react-native-firebase/auth';
 import fireStore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {showMessage, ShowMessage} from 'react-native-flash-message';
 export const SinginCreater = (email, password) => {
   return async (dispatch) => {
     dispatch({
       type: 'SIGN_IN',
-      payload: {loading: true},
+      payload: {SiginLoading: true},
     });
     try {
       const Res = await Auth()
@@ -30,7 +31,12 @@ export const SinginCreater = (email, password) => {
             AsyncStorage.setItem('AuthToken', data.token);
             dispatch({
               type: 'SIGN_IN',
-              payload: {loading: false, AuthToken: data.token, AccessToken: null},
+              payload: {
+                SiginLoading: false,
+                AuthToken: data.token,
+                AccessToken: null,
+                UserData: userData,
+              },
             });
           });
       } else {
@@ -43,10 +49,11 @@ export const SinginCreater = (email, password) => {
             dispatch({
               type: 'SIGN_IN',
               payload: {
-                loading: false,
+                SiginLoading: false,
                 AuthToken: data,
                 AccessToken: data.token,
                 AuthToken: data.token,
+                UserData: userData,
               },
             });
           });
@@ -54,14 +61,19 @@ export const SinginCreater = (email, password) => {
       dispatch({
         type: 'SIGN_IN',
         payload: {
-          loading: false,
+          SiginLoading: false,
         },
       });
     } catch (e) {
+      showMessage({
+        message: e.message,
+        duration: 3000,
+        type: 'danger',
+      });
       console.log(e, 'Ee');
       dispatch({
         type: 'SIGN_IN',
-        payload: {loading: false},
+        payload: {SiginLoading: false},
       });
     }
   };
@@ -73,7 +85,7 @@ export const SignupCreater = (email, password) => {
     console.log('WO');
     dispatch({
       type: 'SIGN_IN',
-      payload: {loading: true},
+      payload: {SignupLoading: true},
     });
     console.log('WOWW');
     try {
@@ -111,7 +123,7 @@ export const SignupCreater = (email, password) => {
         dispatch({
           type: 'SIGN_IN',
           payload: {
-            loading: false,
+            SigupLoading: false,
             AuthToken: TokenData,
             AccessToken: TokenData,
             UserData: {userId: Res.user.uid},
@@ -121,16 +133,21 @@ export const SignupCreater = (email, password) => {
         dispatch({
           type: 'SIGN_IN',
           payload: {
-            loading: false,
+            SignupLoading: false,
           },
         });
       }
     } catch (e) {
+      showMessage({
+        message: e.message,
+        duration: 3000,
+        type: 'danger',
+      });
       console.log(e, 'Ee');
       dispatch({
         type: 'SIGN_IN',
         payload: {
-          loading: false,
+          SignupLoading: false,
         },
       });
     }
