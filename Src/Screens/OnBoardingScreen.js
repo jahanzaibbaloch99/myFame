@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Dimensions} from 'react-native';
+import {Text,View, StyleSheet, Dimensions , Image,Platform} from 'react-native';
 import Button from '../Components/Commmon/Button';
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
 import auth, {firebase} from '@react-native-firebase/auth';
@@ -13,6 +13,10 @@ const Onboard = (props) => {
   const [facebookToken, setFacebookToken] = React.useState('');
   const [fbloading, setLoading] = React.useState(false);
   const onFacebookLogin = async () => {
+    if (Platform.OS === "android") {
+      LoginManager.setLoginBehavior("web_only")
+  }
+
     setLoading(true);
     const result = await LoginManager.logInWithPermissions([
       'public_profile',
@@ -73,11 +77,13 @@ const Onboard = (props) => {
         flex: 1,
         alignContent: 'center',
         alignItems: 'center',
+        backgroundColor:"white"
       }}>
+      <View style={{height:"10%",width:"50%" , justifyContent:"center" ,alignContent:"center" , alignItems:"center"}}><Image style={{height:"100%" ,width:"100%"}} source={require("../../assets/Logo.png")} resizeMode="contain"/></View>
       <Button
         buttonText="Facebook"
         viewStyle={{
-          backgroundColor: '#1DA1F2',
+          backgroundColor: "#4267B2",
           marginTop: '12%',
           width: width / 1.1,
           height: 47,

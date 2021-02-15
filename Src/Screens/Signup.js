@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   View,
+  Image,
   Text,
   SafeAreaView,
   TextInput,
@@ -55,7 +56,7 @@ const Signup = (props) => {
     }
   };
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1 , backgroundColor:"white"}}>
       <View
         style={{
           flex: 1,
@@ -63,12 +64,14 @@ const Signup = (props) => {
           alignItems: 'center',
           alignContent: 'center',
         }}>
+        <View style={{height:"20%",width:"50%" , justifyContent:"center" ,alignContent:"center" , alignItems:"center"}}><Image style={{height:"100%" ,width:"100%"}} source={require("../../assets/Logo.png")} resizeMode="contain"/></View>
         <View
           style={{
             width: '100%',
             justifyContent: 'center',
             alignItems: 'center',
             alignContent: 'center',
+            marginTop:15
           }}>
           <TextInput
             onChangeText={emailOnChange}

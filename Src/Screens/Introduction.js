@@ -13,12 +13,12 @@ import {
 import {Modalize} from 'react-native-modalize';
 import {useDispatch, useSelector} from 'react-redux';
 import {FloatingLabelInput} from 'react-native-floating-label-input';
-import Button from '../Components/Commmon/Button';
 import RNFetchBlob from 'rn-fetch-blob';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import {showMessage} from 'react-native-flash-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Button from "../Components/Commmon/Button"
 var ImagePicker = NativeModules.ImageCropPicker;
 
 const Introduction = (props) => {
@@ -103,6 +103,7 @@ const Introduction = (props) => {
     let url = '';
     try {
       if (profileImage?.uri) {
+        console.log(profileImage?.uri ,"URI")
         const storageRef = await storage().ref(
           `buckets/avatar/${UserData.userId}/`,
         );
@@ -121,13 +122,23 @@ const Introduction = (props) => {
         let ref = storage().ref(uploadTask.metadata.fullPath);
         url = await ref.getDownloadURL().then((url) => url);
       }
-      const Dataref = firestore().collection('Users').doc(UserData.userId);
-      const updated = firestore().batch().update(Dataref, {
-        firstName: firstname,
-        ImageUrl: url,
-        lastName: lastName,
-        userName: userName,
+      const db = firestore();
+      const batch = db.batch();
+      const Dataref = db.collection('Users').doc(UserData.userId).update({
+        firstName: firstname || "",
+        ImageUrl: url || "",
+        lastName: lastName || "",
+        userName: userName || "",
       });
+
+      console.log(Dataref,"REF")
+      // const updated = batch.set(Dataref, {
+      //   firstName: firstname || "",
+      //   ImageUrl: url || "",
+      //   lastName: lastName || "",
+      //   userName: userName || "",
+      // });
+      // console.log(updated , "UPDATED")
       setProfileImage(false);
       await AsyncStorage.removeItem('AccessToken');
       dispatch({
@@ -182,17 +193,23 @@ const Introduction = (props) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{width: '80%', marginTop: '20%', marginLeft: '5%'}}>
           <TouchableOpacity onPress={onOpen}>
-            <View
-              style={{
-                backgroundColor: '#D3D3D3',
-                width: 88,
-                height: 88,
-                borderRadius: 88 / 2,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              {/* <Ionicons name="camera-outline" size={30} color="grey" /> */}
-            </View>
+          {profileImage?.uri ? (
+              <Image
+                source={{uri: profileImage?.uri}}
+                style={{width: 88, height: 88, borderRadius: 90}}
+              />
+            ) : (
+              <View
+                style={{
+                  backgroundColor: '#D3D3D3',
+                  width: 88,
+                  height: 88,
+                  borderRadius: 88 / 2,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+              </View>
+            )}
           </TouchableOpacity>
           <View style={{marginTop: '5%', width: '60%', marginLeft: '3%'}}>
             <Text style={{fontSize: 30, fontWeight: '500', lineHeight: 35}}>
@@ -315,6 +332,7 @@ const Introduction = (props) => {
               buttonText="Finish"
               viewStyle={styles.nextBtn}
               textStyle={styles.nextBtnText}
+              loader={profileLoading}
             />
           </View>
         </View>

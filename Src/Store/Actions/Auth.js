@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import auth from "@react-native-firebase/auth"
 export const getAuthTokenStorage = () => {
   return async (dispatch) => {
     dispatch({
@@ -6,7 +8,7 @@ export const getAuthTokenStorage = () => {
     });
     const accessToken = await AsyncStorage.getItem('AccessToken');
     const authToken = await AsyncStorage.getItem('AuthToken');
-    if (accessToken || accountType || authToken) {
+    if (accessToken ||  authToken) {
       dispatch({
         type: 'ASYNC_STORAGE_TOKEN',
         payload: {
@@ -22,7 +24,6 @@ export const getAuthTokenStorage = () => {
           splash: false,
           authToken: null,
           accessToken: null,
-          accountType: null,
         },
       });
     }
@@ -32,3 +33,13 @@ export const getAuthTokenStorage = () => {
     });
   };
 };
+
+export const Logout = () => {
+  return async dispatch => {
+    await auth().signOut();
+    await AsyncStorage.clear()
+    dispatch({
+      type:"LOGOUT"
+    })
+  }
+}

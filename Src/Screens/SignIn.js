@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Image
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {SignupCreater, SinginCreater} from '../Utils/Firebase/Auth';
@@ -60,13 +61,16 @@ const Signin = (props) => {
           justifyContent: 'center',
           alignItems: 'center',
           alignContent: 'center',
+          backgroundColor:"white"
         }}>
+        <View style={{height:"20%",width:"50%" , justifyContent:"center" ,alignContent:"center" , alignItems:"center"}}><Image style={{height:"100%" ,width:"100%"}} source={require("../../assets/Logo.png")} resizeMode="contain"/></View>
         <View
           style={{
             width: '100%',
             justifyContent: 'center',
             alignItems: 'center',
             alignContent: 'center',
+            marginTop:15
           }}>
           <TextInput
             onChangeText={emailOnChange}

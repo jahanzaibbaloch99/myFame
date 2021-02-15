@@ -6,7 +6,7 @@ export const SinginCreater = (email, password) => {
   return async (dispatch) => {
     dispatch({
       type: 'SIGN_IN',
-      payload: {SiginLoading: true},
+      payload: {SignInLoading: true},
     });
     try {
       const Res = await Auth()
@@ -23,7 +23,9 @@ export const SinginCreater = (email, password) => {
         .then((snapShot) => {
           return snapShot.data();
         });
-      if (userData.userName !== undefined) {
+        console.log(userData , "USSSSS DATAAAASSS")
+      if (userData?.userName) {
+        console.log("IF WOKR")
         await Auth()
           .currentUser.getIdTokenResult()
           .then((data) => {
@@ -31,7 +33,7 @@ export const SinginCreater = (email, password) => {
             dispatch({
               type: 'SIGN_IN',
               payload: {
-                SiginLoading: false,
+                SignInLoading: false,
                 AuthToken: data.token,
                 AccessToken: null,
                 UserData: userData,
@@ -39,6 +41,7 @@ export const SinginCreater = (email, password) => {
             });
           });
       } else {
+        console.log("WORKINGGGG ")
         await Auth()
           .currentUser.getIdTokenResult()
           .then((data) => {
@@ -47,7 +50,7 @@ export const SinginCreater = (email, password) => {
             dispatch({
               type: 'SIGN_IN',
               payload: {
-                SiginLoading: false,
+                SignInLoading: false,
                 AccessToken: data.token,
                 AuthToken: data.token,
                 UserData: userData,
@@ -58,7 +61,7 @@ export const SinginCreater = (email, password) => {
       dispatch({
         type: 'SIGN_IN',
         payload: {
-          SiginLoading: false,
+          SignInLoading: false,
         },
       });
     } catch (e) {
@@ -70,7 +73,7 @@ export const SinginCreater = (email, password) => {
       console.log(e, 'Ee');
       dispatch({
         type: 'SIGN_IN',
-        payload: {SiginLoading: false},
+        payload: {SignInLoading: false},
       });
     }
   };
