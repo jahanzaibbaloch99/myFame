@@ -1,23 +1,34 @@
-// import {SignupCreater, SinginCreater} from '../../Utils/Firebase/Auth';
-// export const SigninExisting = (val) => {
-//   return async (dispatch) => {
-//     const {email, password} = val;
-//     dispatch({
-//       type: 'SIGN_IN',
-//       payload: {loading: true},
-//     });
-//     const data = await SinginCreater(email, password);
-//     console.log(data, 'DATA');
-//   };
-// };
-// export const singUpNew = (val) => {
-//   return async (dispatch) => {
-//     const {email, password} = val;
-//     dispatch({
-//       type: 'SIGN_UP',
-//       payload: {loading: true},
-//     });
-//     const data = await SignupCreater(email, password);
-//     console.log(data, 'DATA');
-//   };
-// };
+export const getAuthTokenStorage = () => {
+  return async (dispatch) => {
+    dispatch({
+      type: 'ASYNC_STORAGE_TOKEN',
+      payload: {splash: true},
+    });
+    const accessToken = await AsyncStorage.getItem('AccessToken');
+    const authToken = await AsyncStorage.getItem('AuthToken');
+    if (accessToken || accountType || authToken) {
+      dispatch({
+        type: 'ASYNC_STORAGE_TOKEN',
+        payload: {
+          splash: false,
+          AuthToken: authToken,
+          AccessToken: accessToken,
+        },
+      });
+    } else {
+      dispatch({
+        type: 'ASYNC_STORAGE_TOKEN',
+        payload: {
+          splash: false,
+          authToken: null,
+          accessToken: null,
+          accountType: null,
+        },
+      });
+    }
+    dispatch({
+      type: 'ASYNC_STORAGE_TOKEN',
+      payload: {splash: false},
+    });
+  };
+};

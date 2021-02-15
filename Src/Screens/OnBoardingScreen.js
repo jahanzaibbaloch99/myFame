@@ -20,7 +20,6 @@ const Onboard = (props) => {
     ]);
     if (result.isCancelled) {
       setLoading(false);
-      console.log('CANCEL');
     }
     const data = await AccessToken.getCurrentAccessToken();
     if (data) {
@@ -36,12 +35,8 @@ const Onboard = (props) => {
         .then((data) => {
           return data;
         });
-      console.log(Authentic.user, 'AITH');
       const UserData = auth().currentUser;
-      console.log(
-        UserData.displayName + Math.random(110 * 2).toFixed(),
-        'USERS DATA',
-      );
+      console.log(UserData, 'USERDATA');
       setLoading(false);
       await fireStore()
         .collection('Users')
@@ -51,17 +46,21 @@ const Onboard = (props) => {
           createdAt: firebase.firestore.Timestamp.now(),
           firstName: UserData.displayName,
           lastName: '',
-          userName: UserData.displayName + Math.random(110 * 2).toFixed(),
+          userName:
+            UserData.displayName +
+            Math.random(900 * 9)
+              .toFixed()
+              .toString(),
           userId: UserData.uid,
-          ImageUrl: '',
+          ImageUrl: UserData.photoURL,
         });
       dispatch({
         type: 'SIGN_IN',
         payload: {
           loading: false,
           AuthToken: data.accessToken,
-          AccessToken: data.accessToken,
-          UserData: {userId: Authentic.uid},
+          AccessToken: null,
+          UserData: {userId: UserData.uid},
         },
       });
     }

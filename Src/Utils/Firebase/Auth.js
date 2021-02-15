@@ -27,7 +27,6 @@ export const SinginCreater = (email, password) => {
         await Auth()
           .currentUser.getIdTokenResult()
           .then((data) => {
-            console.log(data, 'TOKEN');
             AsyncStorage.setItem('AuthToken', data.token);
             dispatch({
               type: 'SIGN_IN',
@@ -43,14 +42,12 @@ export const SinginCreater = (email, password) => {
         await Auth()
           .currentUser.getIdTokenResult()
           .then((data) => {
-            console.log('ELSE DATA', data.token);
             AsyncStorage.setItem('AuthToken', data.token);
             AsyncStorage.setItem('AccessToken', data.token);
             dispatch({
               type: 'SIGN_IN',
               payload: {
                 SiginLoading: false,
-                AuthToken: data,
                 AccessToken: data.token,
                 AuthToken: data.token,
                 UserData: userData,
@@ -80,29 +77,21 @@ export const SinginCreater = (email, password) => {
 };
 
 export const SignupCreater = (email, password) => {
-  console.log('WOW');
   return async (dispatch) => {
-    console.log('WO');
     dispatch({
       type: 'SIGN_IN',
       payload: {SignupLoading: true},
     });
-    console.log('WOWW');
     try {
-      console.log(email);
-      console.log(password, 'PASS');
       const Res = await Auth()
         .createUserWithEmailAndPassword(email, password)
         .then((ele) => {
-          console.log('SIUP ELE ', ele);
           return ele;
         });
-      console.log(Res.user.uid, 'UID');
       if (Res.user) {
         const TokenData = await Auth()
           .currentUser.getIdTokenResult()
           .then(async (doc) => {
-            console.log('UP TOK', doc);
             await AsyncStorage.setItem(
               'AccessToken',
               JSON.stringify(doc.token),
@@ -110,7 +99,6 @@ export const SignupCreater = (email, password) => {
             await AsyncStorage.setItem('AuthToken', JSON.stringify(doc.token));
             return doc.token;
           });
-        console.log(TokenData, 'DTOKE');
         await fireStore().collection('Users').doc(Res.user.uid).set({
           email: email,
           createdAt: firebase.firestore.Timestamp.now(),
@@ -143,7 +131,6 @@ export const SignupCreater = (email, password) => {
         duration: 3000,
         type: 'danger',
       });
-      console.log(e, 'Ee');
       dispatch({
         type: 'SIGN_IN',
         payload: {

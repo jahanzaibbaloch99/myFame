@@ -11,9 +11,14 @@ import {
   StyleSheet,
 } from 'react-native';
 import {Modalize} from 'react-native-modalize';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {FloatingLabelInput} from 'react-native-floating-label-input';
 import Button from '../Components/Commmon/Button';
+import RNFetchBlob from 'rn-fetch-blob';
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import {showMessage} from 'react-native-flash-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 var ImagePicker = NativeModules.ImageCropPicker;
 
 const Introduction = (props) => {
@@ -22,6 +27,9 @@ const Introduction = (props) => {
   const [firstname, setfirstname] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [userName, setUserName] = React.useState('');
+  const [profileImage, setProfileImage] = React.useState({});
+  const {UserData} = useSelector((state) => state.Auth);
+  const [profileLoading, setProfileLoading] = React.useState(false);
   const onOpen = () => {
     modalizeRef.current?.open();
   };
@@ -45,28 +53,16 @@ const Introduction = (props) => {
         Platform.OS === 'ios' ? image?.uri || image?.path : image.path;
       var fileNameReal = path.split('/').pop();
       var fileType = fileNameReal.split('.').pop();
-      const user = {
-        ...userProfile,
-        profileImage: {
-          name: fileNameReal,
-          uri: path,
-          cropRect: image.cropRect,
-          type: image?.mime,
-          mime: fileType,
-        },
+
+      let profileImage = {
+        name: fileNameReal,
+        uri: path,
+        cropRect: image.cropRect,
+        type: image?.mime,
+        mime: fileType,
       };
-      // dispatch(
-      //   setProfilePicker({
-      //     profileImage: {
-      //       name: fileNameReal,
-      //       uri: path,
-      //       cropRect: image.cropRect,
-      //       type: image?.mime,
-      //       mime: fileType,
-      //     },
-      //   }),
-      // );
-      // dispatch(setUserProfile(user));
+
+      setProfileImage(profileImage);
     });
   };
   const openCamera = async () => {
@@ -79,28 +75,16 @@ const Introduction = (props) => {
         Platform.OS === 'ios' ? image?.uri || image?.path : image.path;
       var fileNameReal = path.split('/').pop();
       var fileType = fileNameReal.split('.').pop();
-      const user = {
-        ...userProfile,
-        profileImage: {
-          name: fileNameReal,
-          uri: path,
-          cropRect: image.cropRect,
-          type: image?.mime,
-          mime: fileType,
-        },
+
+      let profileImage = {
+        name: fileNameReal,
+        uri: path,
+        cropRect: image.cropRect,
+        type: image?.mime,
+        mime: fileType,
       };
-      // dispatch(setUserProfile(user));
-      // dispatch(
-      //   setProfilePicker({
-      //     profileImage: {
-      //       name: fileNameReal,
-      //       uri: path,
-      //       cropRect: image.cropRect,
-      //       type: image?.mime,
-      //       mime: fileType,
-      //     },
-      //   }),
-      // );
+
+      setProfileImage(profileImage);
     });
   };
   const dispatch = useDispatch();
@@ -113,6 +97,55 @@ const Introduction = (props) => {
   };
   const changeLast = (e) => {
     setLastName(e);
+  };
+  const uploadToServer = async () => {
+    setProfileLoading(true);
+    let url = '';
+    try {
+      if (profileImage?.uri) {
+        const storageRef = await storage().ref(
+          `buckets/avatar/${UserData.userId}/`,
+        );
+        async function getPathForFirebaseStorage(uri) {
+          if (Platform.OS === 'ios') return uri;
+          const stat = await RNFetchBlob.fs.stat(uri);
+          return stat.path;
+        }
+        const fileUri = await getPathForFirebaseStorage(profileImage.uri);
+        const uploadTask = await storageRef
+          .child(
+            profileImage.name ||
+              `Documents${profileImage.type}${profileImage.size}`,
+          )
+          .putFile(fileUri);
+        let ref = storage().ref(uploadTask.metadata.fullPath);
+        url = await ref.getDownloadURL().then((url) => url);
+      }
+      const Dataref = firestore().collection('Users').doc(UserData.userId);
+      const updated = firestore().batch().update(Dataref, {
+        firstName: firstname,
+        ImageUrl: url,
+        lastName: lastName,
+        userName: userName,
+      });
+      setProfileImage(false);
+      await AsyncStorage.removeItem('AccessToken');
+      dispatch({
+        type: 'SIGN_IN',
+        payload: {
+          loading: false,
+          AccessToken: null,
+        },
+      });
+    } catch (e) {
+      setProfileImage(false);
+      showMessage({
+        message: e.message,
+        duration: 3000,
+        type: 'danger',
+      });
+      console.log(e, 'E');
+    }
   };
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'rgb(255,255,255)'}}>
@@ -263,7 +296,7 @@ const Introduction = (props) => {
                 label="Username"
                 value={userName}
                 onChangeText={(e) => {
-                  changeUserName(e), debounce(e);
+                  changeUserName(e);
                 }}
                 containerStyles={{
                   borderBottomColor: 'rgb(239,239,239)',
@@ -278,6 +311,7 @@ const Introduction = (props) => {
               />
             </View>
             <Button
+              onPress={uploadToServer}
               buttonText="Finish"
               viewStyle={styles.nextBtn}
               textStyle={styles.nextBtnText}

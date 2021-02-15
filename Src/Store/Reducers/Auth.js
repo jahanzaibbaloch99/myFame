@@ -6,6 +6,7 @@ const initialState = {
   AuthToken: null,
   SigupLoading: false,
   SignInLoading: false,
+  splash: false,
 };
 export default (state = initialState, actions) => {
   switch (actions.type) {
@@ -14,26 +15,10 @@ export default (state = initialState, actions) => {
         ...state,
         ...actions.payload,
       };
-    case 'STATE_UPDATE':
-      return {
-        ...state,
-        ...actions.payload,
-      };
-    case 'UPDATE_TOKENS':
-      return {
-        ...state,
-        ...actions.payload,
-      };
     case 'ASYNC_STORAGE_TOKEN':
       return {
         ...state,
         ...actions.payload,
-      };
-
-    case 'LINKEDINREF':
-      return {
-        ...state,
-        linkedinRef: actions.payload,
       };
     case 'LOGOUT':
       return {
