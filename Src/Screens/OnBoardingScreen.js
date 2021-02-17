@@ -1,14 +1,74 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import Button from "../Components/Commmon/Button"
-import { LoginButton, AccessToken } from 'react-native-fbsdk';
+import {Text,View, StyleSheet, Dimensions , Image,Platform} from 'react-native';
+import Button from '../Components/Commmon/Button';
+import {LoginManager, AccessToken} from 'react-native-fbsdk';
+import auth, {firebase} from '@react-native-firebase/auth';
+import {useDispatch} from 'react-redux';
+import fireStore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {height, width} = Dimensions.get('window');
 const Onboard = (props) => {
+  const dispatch = useDispatch();
+  const [facebookToken, setFacebookToken] = React.useState('');
+  const [fbloading, setLoading] = React.useState(false);
+  const onFacebookLogin = async () => {
+    if (Platform.OS === "android") {
+      LoginManager.setLoginBehavior("web_only")
+  }
+
+    setLoading(true);
+    const result = await LoginManager.logInWithPermissions([
+      'public_profile',
+      'email',
+    ]);
+    if (result.isCancelled) {
+      setLoading(false);
+    }
+    const data = await AccessToken.getCurrentAccessToken();
+    if (data) {
+      const faceBookCrediental = auth.FacebookAuthProvider.credential(
+        data.accessToken,
+      );
+      const Authentic = auth()
+        .signInWithCredential(faceBookCrediental)
+        .then((snap) => {
+          AsyncStorage.setItem('AuthToken', data.accessToken);
+          return snap;
+        })
+        .then((data) => {
+          return data;
+        });
+      const UserData = auth().currentUser;
+      console.log(UserData, 'USERDATA');
+      setLoading(false);
+      await fireStore()
+        .collection('Users')
+        .doc(UserData.uid)
+        .set({
+          email: UserData.email,
+          createdAt: firebase.firestore.Timestamp.now(),
+          firstName: UserData.displayName,
+          lastName: '',
+          userName:
+            UserData.displayName +
+            Math.random(900 * 9)
+              .toFixed()
+              .toString(),
+          userId: UserData.uid,
+          ImageUrl: UserData.photoURL,
+        });
+      dispatch({
+        type: 'SIGN_IN',
+        payload: {
+          loading: false,
+          AuthToken: data.accessToken,
+          AccessToken: null,
+          UserData: {userId: UserData.uid},
+        },
+      });
+    }
+  };
   return (
     <View
       style={{
@@ -17,37 +77,34 @@ const Onboard = (props) => {
         flex: 1,
         alignContent: 'center',
         alignItems: 'center',
+        backgroundColor:"white"
       }}>
-      <View>
-        <LoginButton
-          onLoginFinished={
-            (error, result) => {
-              if (error) {
-                console.log("login has error: " +  error);
-              } else if (result.isCancelled) {
-                console.log("login is cancelled.");
-              } else {
-                AccessToken.getCurrentAccessToken().then(
-                  (data) => {
-                    console.log(data.accessToken.toString())
-                  }
-                )
-              }
-            }
-          }
-          onLogoutFinished={() => console.log("logout.")}/>
-      </View>
-      
+      <View style={{height:"10%",width:"50%" , justifyContent:"center" ,alignContent:"center" , alignItems:"center"}}><Image style={{height:"100%" ,width:"100%"}} source={require("../../assets/Logo.png")} resizeMode="contain"/></View>
+      <Button
+        buttonText="Facebook"
+        viewStyle={{
+          backgroundColor: "#4267B2",
+          marginTop: '12%',
+          width: width / 1.1,
+          height: 47,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 90,
+        }}
+        textStyle={styles.joinEnticeBtnText}
+        onPress={() => onFacebookLogin()}
+        loader={fbloading}
+      />
       <Button
         buttonText="Twitter"
         viewStyle={{
           backgroundColor: '#1DA1F2',
-    marginTop: '12%',
-    width: width / 1.1,
-    height: 47,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 90,
+          marginTop: '12%',
+          width: width / 1.1,
+          height: 47,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 90,
         }}
         textStyle={styles.joinEnticeBtnText}
         onPress={() => props.navigation.navigate('Signup')}

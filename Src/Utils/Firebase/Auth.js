@@ -1,54 +1,79 @@
 import Auth, {firebase} from '@react-native-firebase/auth';
 import fireStore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {showMessage, ShowMessage} from 'react-native-flash-message';
 export const SinginCreater = (email, password) => {
   return async (dispatch) => {
     dispatch({
       type: 'SIGN_IN',
-      payload: {loading: true},
+      payload: {SignInLoading: true},
     });
     try {
       const Res = await Auth()
         .signInWithEmailAndPassword(email, password)
         .then((ele) => {
-          return ele
+          console.log(ele, 'ELEE<M');
+          return ele;
         });
-        console.log(Res,"RES")
+      console.log(Res, 'RES');
       const userData = await fireStore()
         .collection('Users')
         .doc(Res.user.uid)
         .get()
-        .then((snapShot) => (snapShot.data()));
-        console.log(userData,"DATA")
-      if (userData.userName !== undefined) {
+        .then((snapShot) => {
+          return snapShot.data();
+        });
+        console.log(userData , "USSSSS DATAAAASSS")
+      if (userData?.userName) {
+        console.log("IF WOKR")
         await Auth()
           .currentUser.getIdTokenResult()
           .then((data) => {
-            console.log(data , "DTATATOKEN")
             AsyncStorage.setItem('AuthToken', data.token);
             dispatch({
               type: 'SIGN_IN',
-              payload: {loading: false, AuthToken: data.token,AccessToken:null,UserData:userData},
+              payload: {
+                SignInLoading: false,
+                AuthToken: data.token,
+                AccessToken: null,
+                UserData: userData,
+              },
             });
           });
       } else {
+        console.log("WORKINGGGG ")
         await Auth()
           .currentUser.getIdTokenResult()
           .then((data) => {
-            console.log("ELESE")
             AsyncStorage.setItem('AuthToken', data.token);
             AsyncStorage.setItem('AccessToken', data.token);
             dispatch({
               type: 'SIGN_IN',
-              payload: {loading: false, AuthToken: data.token, AccessToken: data.token , UserData:userData},
+              payload: {
+                SignInLoading: false,
+                AccessToken: data.token,
+                AuthToken: data.token,
+                UserData: userData,
+              },
             });
           });
       }
-    } catch (e) {
-      console.log(e , "EEE")
       dispatch({
         type: 'SIGN_IN',
-        payload: {loading: false},
+        payload: {
+          SignInLoading: false,
+        },
+      });
+    } catch (e) {
+      showMessage({
+        message: e.message,
+        duration: 3000,
+        type: 'danger',
+      });
+      console.log(e, 'Ee');
+      dispatch({
+        type: 'SIGN_IN',
+        payload: {SignInLoading: false},
       });
     }
   };
@@ -58,60 +83,61 @@ export const SignupCreater = (email, password) => {
   return async (dispatch) => {
     dispatch({
       type: 'SIGN_IN',
-      payload: {loading: true},
+      payload: {SignupLoading: true},
     });
     try {
       const Res = await Auth()
         .createUserWithEmailAndPassword(email, password)
-        .then((ele) => ele);
-        console.log(Res.user.uid , "RESSS")
-      
-        
+        .then((ele) => {
+          return ele;
+        });
+      if (Res.user) {
         const TokenData = await Auth()
           .currentUser.getIdTokenResult()
           .then(async (doc) => {
-            console.log(doc , "DOCCTOKEN")
-            await AsyncStorage.setItem('AccessToken', JSON.stringify(doc.token));
+            await AsyncStorage.setItem(
+              'AccessToken',
+              JSON.stringify(doc.token),
+            );
             await AsyncStorage.setItem('AuthToken', JSON.stringify(doc.token));
             return doc.token;
           });
-          const UserData = await fireStore().collection('Users').doc(Res.user.uid).set({
-            email: email,
-            createdAt: firebase.firestore.Timestamp.now(),
-            firstName: '1212',
-            lastName: '',
-            userName: '',
-            userId: Res.user.uid,
-            ImageUrl: '',
-            gender:"Not Specified",
-          }).then((doc) => {
-            console.log(doc , "DOC")
-          })
-
-      
-          console.log(UserData , "userData")
+        await fireStore().collection('Users').doc(Res.user.uid).set({
+          email: email,
+          createdAt: firebase.firestore.Timestamp.now(),
+          firstName: '',
+          lastName: '',
+          userName: '',
+          userId: Res.user.uid,
+          ImageUrl: '',
+        });
         dispatch({
           type: 'SIGN_IN',
           payload: {
-            loading: false,
+            SigupLoading: false,
             AuthToken: TokenData,
             AccessToken: TokenData,
-            UserData:{userId:Res.user.uid}
+            UserData: {userId: Res.user.uid},
           },
         });
-      
-      dispatch({
-        type: 'SIGN_IN',
-        payload: {
-          loading: false,
-        },
-      });
+
+        dispatch({
+          type: 'SIGN_IN',
+          payload: {
+            SignupLoading: false,
+          },
+        });
+      }
     } catch (e) {
-      console.log(e , "E")
+      showMessage({
+        message: e.message,
+        duration: 3000,
+        type: 'danger',
+      });
       dispatch({
         type: 'SIGN_IN',
         payload: {
-          loading: false,
+          SignupLoading: false,
         },
       });
     }

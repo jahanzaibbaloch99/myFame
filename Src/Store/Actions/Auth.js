@@ -1,23 +1,45 @@
-import {SignupCreater, SinginCreater} from '../../Utils/Firebase/Auth';
-export const SigninExisting = (val) => {
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import auth from "@react-native-firebase/auth"
+export const getAuthTokenStorage = () => {
   return async (dispatch) => {
-    const {email, password} = val;
     dispatch({
-      type: 'SIGN_IN',
-      payload: {loading: true},
+      type: 'ASYNC_STORAGE_TOKEN',
+      payload: {splash: true},
     });
-    const data = await SinginCreater(email, password);
-    console.log(data, 'DATA');
+    const accessToken = await AsyncStorage.getItem('AccessToken');
+    const authToken = await AsyncStorage.getItem('AuthToken');
+    if (accessToken ||  authToken) {
+      dispatch({
+        type: 'ASYNC_STORAGE_TOKEN',
+        payload: {
+          splash: false,
+          AuthToken: authToken,
+          AccessToken: accessToken,
+        },
+      });
+    } else {
+      dispatch({
+        type: 'ASYNC_STORAGE_TOKEN',
+        payload: {
+          splash: false,
+          authToken: null,
+          accessToken: null,
+        },
+      });
+    }
+    dispatch({
+      type: 'ASYNC_STORAGE_TOKEN',
+      payload: {splash: false},
+    });
   };
 };
-export const singUpNew = (val) => {
-  return async (dispatch) => {
-    const {email, password} = val;
+
+export const Logout = () => {
+  return async dispatch => {
+    await auth().signOut();
+    await AsyncStorage.clear()
     dispatch({
-      type: 'SIGN_UP',
-      payload: {loading: true},
-    });
-    const data = await SignupCreater(email, password);
-    console.log(data, 'DATA');
-  };
-};
+      type:"LOGOUT"
+    })
+  }
+}

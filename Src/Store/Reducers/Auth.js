@@ -1,18 +1,16 @@
 const initialState = {
-  data: '',
+  UserData: {},
   loading: false,
   error: false,
-  accessToken: null,
-  authToken: null,
+  AccessToken: null,
+  AuthToken: null,
+  SigupLoading: false,
+  SignInLoading: false,
+  splash: false,
 };
 export default (state = initialState, actions) => {
   switch (actions.type) {
-    case 'STATE_UPDATE':
-      return {
-        ...state,
-        ...actions.payload,
-      };
-    case 'UPDATE_TOKENS':
+    case 'SIGN_IN':
       return {
         ...state,
         ...actions.payload,
@@ -21,12 +19,6 @@ export default (state = initialState, actions) => {
       return {
         ...state,
         ...actions.payload,
-      };
-
-    case 'LINKEDINREF':
-      return {
-        ...state,
-        linkedinRef: actions.payload,
       };
     case 'LOGOUT':
       return {
