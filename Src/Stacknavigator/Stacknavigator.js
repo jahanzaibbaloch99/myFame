@@ -6,7 +6,9 @@ import Signup from '../Screens/Signup';
 import Onboarding from '../Screens/OnBoardingScreen';
 import Introduction from '../Screens/Introduction';
 import {useSelector} from 'react-redux';
-import Welcome from '../Screens/Welcome';
+// import Home from '../Screens/Home';
+import BottomTabBar from "./BottomTabNavigation"
+import CreatePost from '../Screens/CreatePost';
 const Stack = createStackNavigator();
 
 const StackNavigation = (props) => {
@@ -27,7 +29,9 @@ const StackNavigation = (props) => {
         </Stack.Navigator>
       ) : authCheck ? (
         <Stack.Navigator>
-          <Stack.Screen name="Welcome" component={Welcome} />
+          <Stack.Screen name="Home" component={BottomTabBar} />
+          <Stack.Screen name="Create" component={CreatePost} />
+
         </Stack.Navigator>
       ) : (
         <Stack.Navigator>
