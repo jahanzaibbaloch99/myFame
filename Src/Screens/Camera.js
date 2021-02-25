@@ -1,38 +1,75 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { RNCamera } from 'react-native-camera';
+import PhotoEditor from 'react-native-photo-editor';
 
 import { useNavigation } from '@react-navigation/native';
 
 const Camera = () => {
     const [isRecording, setIsRecording] = useState(false);
+    const [data , setData] = useState("")
     const camera = useRef();
 
     const navigation = useNavigation();
 
     const onRecord = async () => {
-        if (isRecording) {
-            camera.current.stopRecording();
-        } else {
-            const data = await camera.current.recordAsync();
-            navigation.navigate('CreatePost', { videoUri: data.uri });
-        }
+            const data = await camera.current.takePictureAsync();
+           setData(data)
+            // navigation.navigate('CreatePost', { videoUri: data.uri });
     };
-
+    const onEdit = () => {
+        PhotoEditor.Edit({
+            path:data.uri,
+            stickers: [
+                'sticker0',
+                'sticker1',
+                'sticker2',
+                'sticker3',
+                'sticker4',
+                'sticker5',
+                'sticker6',
+                'sticker7',
+                'sticker8',
+                'sticker9',
+                'sticker10',
+              ],
+            //   hiddenControls: [
+            //     'clear',
+            //     'crop',
+            //     'draw',
+            //     'save',
+            //     'share',
+            //     'sticker',
+            //     'text',
+            //   ],
+              colors: undefined,
+              onDone: () => {
+                console.log('on done');
+              },
+              onCancel: () => {
+                console.log('on cancel');
+              }
+        })
+    }
     return (
         <View style={styles.container}>
             <RNCamera
                 ref={camera}
-                onRecordingStart={() => setIsRecording(true)}
-                onRecordingEnd={() => setIsRecording(false)}
                 style={styles.preview}
+                type={RNCamera.Constants.Type.back}
+                flashMode={RNCamera.Constants.FlashMode.on}
+                onPictureTaken={() => onEdit()}
             />
-            <TouchableOpacity
-                onPress={onRecord}
-                style={
-                    isRecording ? styles.buttonStop : styles.buttonRecord
-                }
-            />
+            <View style={{ backgroundColor: "black", justifyContent: "center", alignItems: "center" }}>
+                <TouchableOpacity>
+                    <Text style={{ color: "white", fontSize: 20 }} >Filters</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={onRecord}
+                    style={styles.buttonRecord}
+                />
+            </View>
+
         </View>
     );
 };
