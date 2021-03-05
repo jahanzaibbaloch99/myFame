@@ -20,6 +20,11 @@ export default (state = initialState, actions) => {
         ...state,
         ...actions.payload,
       };
+    case "USER_DATA":
+      return {
+        ...state,
+        ...actions.payload
+      }
     case 'LOGOUT':
       return {
         ...initialState,
