@@ -12,10 +12,10 @@ import {FloatingLabelInput} from 'react-native-floating-label-input';
 import {useDispatch} from 'react-redux';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
+import {showMessage} from 'react-native-flash-message';
 const {height, width} = Dimensions.get('screen');
 
 const CreatePost = (props) => {
-  console.log(props, 'PROPS');
   const dispatch = useDispatch();
   const [description, setDescription] = useState('');
   const [videoKey, setVideoKey] = useState(null);
@@ -38,7 +38,7 @@ const CreatePost = (props) => {
   const onPublish = async () => {
     if (description) {
       try {
-        setLoading(true)
+        setLoading(true);
         let url;
         const storageRef = storage().ref(
           `buckets/PostImages/${userData.userId}/`,
@@ -60,32 +60,52 @@ const CreatePost = (props) => {
             description: description,
             userData: userData,
             userId: userData.userId,
-            comments: [],
             likes: [],
           });
-        const ImagePostData = db
-          .collection('ImagePosts')
-          .get()
-          .then((doc) => {
-            doc.forEach((snapShot) => {
-              return snapShot.data();
-            });
-           
-            console.log(doc, 'DCOC');
-          });
-          dispatch({
-            type: 'POST_IMAGE_DATA',
-            payload: {ImagePostData},
-          });
-          setLoading(false)
+        let imagePost = [];
+
+        getPost();
+        setLoading(false);
+        props.navigation.navigate('Home', {
+          screen: 'Home',
+        });
+        showMessage({
+          message: 'You Posted Successfully',
+          duration: 3000,
+          type: 'success',
+        });
       } catch (e) {
-        setLoading(false)
+        setLoading(false);
         console.log(e);
       }
     }
     // create post in the database (API)
   };
-
+  const getPost = async () => {
+    try {
+      const db = fireStore();
+      let imagePost = [];
+      const ImagePost = db
+        .collection('ImagePosts')
+        .get()
+        .then((doc) => {
+          doc.forEach((snapShot) => {
+            const data = {
+              ...snapShot.data(),
+              id: snapShot.id,
+            };
+            imagePost.push(data);
+            return snapShot.data();
+          });
+          dispatch({
+            type: 'POST_IMAGE_DATA',
+            payload: {ImagePostData: imagePost},
+          });
+        });
+    } catch (e) {
+      console.log(e, 'E');
+    }
+  };
   return (
     <View
       style={[

@@ -3,7 +3,6 @@ package com.myfamevideoapp;
 import com.facebook.react.ReactActivity;
 import org.devio.rn.splashscreen.SplashScreen; // import this
 import android.os.Bundle; 
-import com.reactlibrary.RNImageFilterPackage;
 
 public class MainActivity extends ReactActivity {
 protected void onCreate(Bundle savedInstanceState) {

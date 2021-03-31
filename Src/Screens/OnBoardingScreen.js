@@ -1,11 +1,19 @@
 import React from 'react';
-import {Text,View, StyleSheet, Dimensions , Image,Platform} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Dimensions,
+  Image,
+  Platform,
+} from 'react-native';
 import Button from '../Components/Commmon/Button';
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
 import auth, {firebase} from '@react-native-firebase/auth';
 import {useDispatch} from 'react-redux';
 import fireStore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Use } from 'react-native-svg';
 
 const {height, width} = Dimensions.get('window');
 const Onboard = (props) => {
@@ -13,9 +21,9 @@ const Onboard = (props) => {
   const [facebookToken, setFacebookToken] = React.useState('');
   const [fbloading, setLoading] = React.useState(false);
   const onFacebookLogin = async () => {
-    if (Platform.OS === "android") {
-      LoginManager.setLoginBehavior("web_only")
-  }
+    if (Platform.OS === 'android') {
+      LoginManager.setLoginBehavior('web_only');
+    }
 
     setLoading(true);
     const result = await LoginManager.logInWithPermissions([
@@ -40,33 +48,52 @@ const Onboard = (props) => {
           return data;
         });
       const UserData = auth().currentUser;
-      console.log(UserData, 'USERDATA');
-      setLoading(false);
-      await fireStore()
+      console.log(UserData.uid)
+      const userData = await fireStore()
         .collection('Users')
         .doc(UserData.uid)
-        .set({
-          email: UserData.email,
-          createdAt: firebase.firestore.Timestamp.now(),
-          firstName: UserData.displayName,
-          lastName: '',
-          userName:
-            UserData.displayName +
-            Math.random(900 * 9)
-              .toFixed()
-              .toString(),
-          userId: UserData.uid,
-          ImageUrl: UserData.photoURL,
+        .get()
+        .then((snapShot) => {
+          return snapShot.data();
         });
-      dispatch({
-        type: 'SIGN_IN',
-        payload: {
-          loading: false,
-          AuthToken: data.accessToken,
-          AccessToken: null,
-          UserData: {userId: UserData.uid},
-        },
-      });
+      setLoading(false);
+      if (!userData.userName) {
+        await fireStore()
+          .collection('Users')
+          .doc(UserData.uid)
+          .set({
+            email: UserData.email,
+            createdAt: firebase.firestore.Timestamp.now(),
+            firstName: UserData.displayName,
+            lastName: '',
+            userName:
+              UserData.displayName +
+              Math.random(900 * 9)
+                .toFixed()
+                .toString(),
+            userId: UserData.uid,
+            ImageUrl: UserData.photoURL,
+          });
+        dispatch({
+          type: 'SIGN_IN',
+          payload: {
+            loading: false,
+            AuthToken: data.accessToken,
+            AccessToken: null,
+            UserData: {userId: UserData.uid},
+          },
+        });
+      } else {
+        dispatch({
+          type: 'SIGN_IN',
+          payload: {
+            loading: false,
+            AuthToken: data.accessToken,
+            AccessToken: null,
+            UserData: userData,
+          },
+        });
+      }
     }
   };
   return (
@@ -77,13 +104,26 @@ const Onboard = (props) => {
         flex: 1,
         alignContent: 'center',
         alignItems: 'center',
-        backgroundColor:"white"
+        backgroundColor: 'white',
       }}>
-      <View style={{height:"10%",width:"50%" , justifyContent:"center" ,alignContent:"center" , alignItems:"center"}}><Image style={{height:"100%" ,width:"100%"}} source={require("../../assets/Logo.png")} resizeMode="contain"/></View>
+      <View
+        style={{
+          height: '10%',
+          width: '50%',
+          justifyContent: 'center',
+          alignContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Image
+          style={{height: '100%', width: '100%'}}
+          source={require('../../assets/Logo.png')}
+          resizeMode="contain"
+        />
+      </View>
       <Button
         buttonText="Facebook"
         viewStyle={{
-          backgroundColor: "#4267B2",
+          backgroundColor: '#4267B2',
           marginTop: '12%',
           width: width / 1.1,
           height: 47,

@@ -10,7 +10,6 @@ import {
 import {RNCamera} from 'react-native-camera';
 import PhotoEditor from 'react-native-photo-editor';
 // import RNFetchBlob from 'rn-fetch-blob';
-import RNImageFilter from 'react-native-image-filter';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import RNFS from 'react-native-fs';
@@ -18,10 +17,11 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {Modalize} from 'react-native-modalize';
 import RNFetchBlob from 'rn-fetch-blob';
+import Button from "../Components/Commmon/Button"
 var ImagePicker = NativeModules.ImageCropPicker;
 
 const Camera = (props) => {
-  const {navigation} = props
+  const {navigation} = props;
   const {UserData} = useSelector((state) => state.Auth);
   const [isRecording, setIsRecording] = useState(false);
   const [newPic, setNewpic] = useState(false);
@@ -195,8 +195,7 @@ const Camera = (props) => {
         //   const stat = await RNFetchBlob.fs.stat(uri);
         //   return stat.path;
         // }
-        let url = '';
-        console.log(profileImage?.uri, 'URI');
+        const fileUri = await getPathForFirebaseStorage(profileImage.uri);
         PhotoEditor.Edit({
           path: fileUri,
           stickers: [
@@ -222,14 +221,13 @@ const Camera = (props) => {
           //     'text',
           //   ],
           colors: undefined,
-          onDone: (data) => {
-            fileUri;
-            // let binaryFile = Image.resolveAssetSource(require('./assets/photo.jpg'));
-            // console.log(binaryFile)
-
-            console.log(data, 'DATA');
-            console.log('on done');
-            setNewpic(true);
+          onDone: async () => {
+            modalizeRef.current?.close();
+            navigation.navigate('CreatePost', {
+              videoUri: fileUri,
+              profileImage: profileImage,
+              UserData: UserData,
+            });
           },
           onCancel: () => {
             console.log('on cancel');
@@ -286,16 +284,7 @@ const Camera = (props) => {
       return stat.path;
     }
     const fileUri = await getPathForFirebaseStorage(data.uri);
-    RNImageFilter.getSourceImage(
-      {
-        imageSource: fileUri,
-        dataType: 'Path',
-        filterType: 1,
-      },
-      (source) => {
-        console.log(source);
-      },
-    );
+
     // async function getPathForFirebaseStorage(uri) {
     //     if (Platform.OS === 'ios') return uri;
     //     const stat = await RNFetchBlob.fs.stat(uri);
@@ -337,6 +326,9 @@ const Camera = (props) => {
   };
   return (
     <View style={styles.container}>
+      <View>
+        <Button />
+      </View>
       <Modalize ref={modalizeRef} modalHeight={200}>
         <TouchableOpacity onPress={openCamera} style={{alignItems: 'center'}}>
           {/* {picUri && (
@@ -381,7 +373,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: 'black',
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
   },
   preview: {
     flex: 1,

@@ -6,7 +6,7 @@ const initialState = {
   AuthToken: null,
   SigupLoading: false,
   SignInLoading: false,
-  splash: false,
+  splash: true,
 };
 export default (state = initialState, actions) => {
   switch (actions.type) {
@@ -20,11 +20,11 @@ export default (state = initialState, actions) => {
         ...state,
         ...actions.payload,
       };
-    case "USER_DATA":
+    case 'USER_DATA':
       return {
         ...state,
-        ...actions.payload
-      }
+        ...actions.payload,
+      };
     case 'LOGOUT':
       return {
         ...initialState,

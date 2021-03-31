@@ -1,24 +1,25 @@
 import React, {useEffect, useState} from 'react';
-import {View, FlatList, Dimensions} from 'react-native';
+import {View, FlatList, Dimensions, Text} from 'react-native';
 import Post from '../Components/Commmon/Post';
 import {useDispatch, useSelector} from 'react-redux';
 import Auth from '@react-native-firebase/auth';
 import fireStore from '@react-native-firebase/firestore';
 import Spinner from '../Components/Commmon/Spinner';
+import Share from 'react-native-share';
 const Home = () => {
   const dispatch = useDispatch();
   const {ImagePostData} = useSelector((state) => state.Post);
-  console.log(ImagePostData, 'POST');
+  const {UserData} = useSelector((state) => state.Auth);
   const [loading, setLoading] = useState(false);
-  const [posts, setPosts] = useState([
-    {name: 'dsa'},
-    {name: 'dsa'},
-    {name: 'dsa'},
-  ]);
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    setData(ImagePostData);
+  }, [ImagePostData]);
   useEffect(() => {
     GetuserData();
     getPost();
   }, []);
+
   const getPost = async () => {
     try {
       setLoading(true);
@@ -29,7 +30,11 @@ const Home = () => {
         .get()
         .then((doc) => {
           doc.forEach((snapShot) => {
-            imagePost.push(snapShot.data());
+            const data = {
+              ...snapShot.data(),
+              id: snapShot.id,
+            };
+            imagePost.push(data);
             return snapShot.data();
           });
           dispatch({
@@ -58,30 +63,34 @@ const Home = () => {
         });
       });
   };
-  // useEffect(() => {
-  //   const fetchPost = async () => {
-  //     // fetch all the posts
-  //     try {
-  //       const response = await API.graphql(graphqlOperation(listPosts));
-  //       setPosts(response.data.listPosts.items);
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   };
-
-  //   fetchPost();
-  // }, []);
-
+  
   return (
-    <View>
-      <FlatList
-        data={ImagePostData}
-        renderItem={({item}) => <Post post={item} />}
-        showsVerticalScrollIndicator={false}
-        snapToInterval={Dimensions.get('window').height - 130}
-        snapToAlignment={'start'}
-        decelerationRate={'fast'}
-      />
+    <View style={{flex: 1}}>
+      {loading ? (
+        <View>
+          <Spinner size="small" color="black" />
+        </View>
+      ) : data?.length ? (
+        <FlatList
+          data={data}
+          renderItem={({item, index}) => (
+            <Post post={item} index={index} UserData={UserData} />
+          )}
+          showsVerticalScrollIndicator={false}
+          snapToInterval={Dimensions.get('window').height}
+          snapToAlignment={'start'}
+          decelerationRate={'fast'}
+        />
+      ) : (
+        <View
+          style={{
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text> No Post Added Yet</Text>
+        </View>
+      )}
     </View>
   );
 };

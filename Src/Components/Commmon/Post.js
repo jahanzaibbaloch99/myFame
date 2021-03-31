@@ -7,53 +7,106 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  Share,
   Dimensions,
+  Modal,
 } from 'react-native';
-
-import Entypo from 'react-native-vector-icons/Entypo';
+import Comment from '../Commmon/Comments';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {useDispatch, useSelector} from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import firestore from '@react-native-firebase/firestore';
 const image = {uri: 'https://reactjs.org/logo-og.png'};
 const Post = (props) => {
-    const {post} = props;
-  console.log(props, 'PROPS');
-  //   const [post, setPost] = useState(props.post);
-  //   const [isLiked, setIsLiked] = useState(false);
-  //   const [videoUri, setVideoUri] = useState('');
+  const dispatch = useDispatch();
+  const {post, UserData, index} = props;
 
-  //   const [paused, setPaused] = useState(false);
-
-  //   const onPlayPausePress = () => {
-  //     setPaused(!paused);
-  //   };
-
-  //   const onLikePress = () => {
-  //     const likesToAdd = isLiked ? -1 : 1;
-  //     setPost({
-  //       ...post,
-  //       likes: post.likes + likesToAdd,
-  //     });
-  //     setIsLiked(!isLiked);
-  //   };
-
-  //   const getVideoUri = async () => {
-  //     if (post.videoUri.startsWith('http')) {
-  //       setVideoUri(post.videoUri);
-  //       return;
-  //     }
-  //     setVideoUri(await Storage.get(post.videoUri));
-  //   };
-
-  //   useEffect(() => {
-  //     getVideoUri();
-  //   },[]);
-
+  const {ImagePostData, Comments} = useSelector((state) => state.Post);
+  const contentLiked =
+    Boolean(post?.likes?.length) && post.likes.includes(UserData.userId);
+  const sortLikedData = (id, userId) => {
+    const newData = ImagePostData.map((val, ind) => {
+      if (val.id === id) {
+        val.likes = Object.assign([], val.likes);
+        val.likes.push(userId);
+      }
+      return val;
+    });
+    dispatch({
+      type: 'POST_IMAGE_DATA',
+      payload: {ImagePostData: newData},
+    });
+  };
+  const [like, setLike] = useState(false);
+  console.log(index, 'INDEX');
+  const [show, setShow] = useState(false);
+  const CancelModal = () => {
+    setShow(false);
+  };
+  const LikePost = async () => {
+    try {
+      sortLikedData(post.id, UserData.userId);
+      await firestore()
+        .collection('ImagePosts')
+        .doc(post.id)
+        .update({
+          likes: firestore.FieldValue.arrayUnion(UserData.userId),
+        });
+    } catch (e) {
+      sortUnlikeData(post.id, UserData.userId);
+    }
+  };
+  const UnLikePost = async () => {
+    try {
+      console.likes('UNLIKE');
+      sortUnlikeData(post.id, UserData.userId);
+      await firestore()
+        .collection('ImagePosts')
+        .doc(post.id)
+        .update({
+          likes: firestore.FieldValue.arrayRemove(UserData.userId),
+        });
+    } catch (e) {
+      sortLikedData(post.id, UserData.userId);
+    }
+  };
+  const sortUnlikeData = (id, userId) => {
+    console.log('UNLIKE', id, userId, 'USERID');
+    const updatedContentData = [...ImagePostData];
+    const selectedContent = getSelectedContent(id);
+    const updatedItemWithoutLike = {
+      ...selectedContent[1],
+      likes: selectedContent[1]['likes'].filter((user) => user !== userId),
+    };
+    updatedContentData[selectedContent[0]] = updatedItemWithoutLike;
+    // setContents(updatedContentData);
+    console.log(updatedContentData);
+    dispatch({
+      type: 'POST_IMAGE_DATA',
+      payload: {ImagePostData: updatedContentData},
+    });
+  };
+  const getSelectedContent = (id) => {
+    const itemIndex = contentsData.findIndex((snap) => snap.id === id);
+    const item = contentsData.find((snap) => snap.id === id);
+    return [itemIndex, item];
+  };
+  const onShare = async (Url) => {
+    try {
+      Share.share({
+        message: post.ImageUrl,
+      });
+    } catch (e) {}
+  };
   return (
     <View style={styles.container}>
+      <Modal visible={show}>
+        <Comment CancelModal={CancelModal} post={post} UserData={UserData} />
+      </Modal>
       <TouchableWithoutFeedback>
         <ImageBackground
-          source={{uri:post.ImageUrl}}
+          source={{uri: post.ImageUrl}}
           style={{
             flex: 1,
             resizeMode: 'cover',
@@ -71,27 +124,47 @@ const Post = (props) => {
 
             <View style={styles.uiContainer}>
               <View style={styles.rightContainer}>
-                <Image
-                  style={styles.profilePicture}
-                  // source={{uri: post.user.imageUri}}
-                />
+                {post?.userData?.ImageUrl ? (
+                  <Image
+                    style={styles.profilePicture}
+                    source={{
+                      uri: post.userData.ImageUrl.replace(/^\"(.+)\"$/, '$1'),
+                    }}
+                  />
+                ) : (
+                  <Image
+                    style={styles.profilePicture}
+                    source={require('../../../assets/avatar.png')}
+                  />
+                )}
 
-                <TouchableOpacity style={styles.iconContainer}>
-                  <AntDesign name={'heart'} size={40} color={'red'} />
-                  <Text style={styles.statsLabel}>Like</Text>
+                <TouchableOpacity
+                  style={styles.iconContainer}
+                  onPress={!contentLiked ? LikePost : null}>
+                  <AntDesign
+                    name={'heart'}
+                    size={40}
+                    color={`${contentLiked ? 'red' : 'white'}`}
+                  />
+                  <Text style={styles.statsLabel}>
+                    {post?.likes ? post?.likes?.length : 0}
+                  </Text>
                 </TouchableOpacity>
 
-                <View style={styles.iconContainer}>
+                <TouchableOpacity
+                  style={styles.iconContainer}
+                  onPress={() => setShow(true)}>
                   <FontAwesome name={'commenting'} size={40} color="white" />
-                  <Text style={styles.statsLabel}>Commet</Text>
-                </View>
+                  <Text style={styles.statsLabel}>Comments</Text>
+                </TouchableOpacity>
 
-                <View style={styles.iconContainer}>
+                <TouchableOpacity
+                  onPress={onShare}
+                  style={styles.iconContainer}>
                   <Fontisto name={'share-a'} size={35} color="white" />
                   <Text style={styles.statsLabel}>Shares</Text>
-                </View>
+                </TouchableOpacity>
               </View>
-
               <View style={styles.bottomContainer}>
                 <View>
                   <Text style={styles.handle}>@{post?.userData?.userName}</Text>
@@ -108,7 +181,7 @@ const Post = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: Dimensions.get('window').height - 100,
+    height: Dimensions.get('window').height,
   },
   videPlayButton: {
     position: 'absolute',
@@ -134,6 +207,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
+    marginVertical: 40,
   },
   handle: {
     color: '#fff',
@@ -182,6 +256,7 @@ const styles = StyleSheet.create({
 
   iconContainer: {
     alignItems: 'center',
+    flexDirection: 'column',
   },
   statsLabel: {
     color: '#fff',

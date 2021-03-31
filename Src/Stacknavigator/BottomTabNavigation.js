@@ -3,13 +3,13 @@ import {Image, Text} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from '../Screens/Home';
 import Camera from '../Screens/Camera';
-import Profile from "../Screens/Profile";
+import Profile from '../Screens/Profile';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// import plusIcon from '../assets/images/plus-icon.png';
+import plusIcon from '../../assets/plus-icon.png';
 
 const Tab = createBottomTabNavigator();
 
@@ -44,12 +44,12 @@ const BottomTabNavigation = () => {
         name={'Upload'}
         component={Camera}
         options={{
-          // tabBarIcon: ({}) => (
-          //   <Image
-          //     source={plusIcon}
-          //     style={{height: 35, resizeMode: 'contain'}}
-          //   />
-          // ),
+          tabBarIcon: ({}) => (
+            <Image
+              source={plusIcon}
+              style={{height: 35, resizeMode: 'contain'}}
+            />
+          ),
           tabBarLabel: () => null,
         }}
       />

@@ -175,7 +175,6 @@ export default function Profile() {
         mime: fileType,
       };
       if (profileImage?.uri) {
-        console.log(profileImage?.uri, 'URI');
         const storageRef = await storage().ref(
           `buckets/avatar/${userProfile.userId}/`,
         );
@@ -209,7 +208,6 @@ export default function Profile() {
           .get()
           .then((data) => {
             const newdata = data.data();
-            console.log(newdata, 'NEw');
             dispatch({
               type: 'USER_DATA',
               payload: {UserData: newdata},

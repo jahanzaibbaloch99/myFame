@@ -12,10 +12,8 @@ export const SinginCreater = (email, password) => {
       const Res = await Auth()
         .signInWithEmailAndPassword(email, password)
         .then((ele) => {
-          console.log(ele, 'ELEE<M');
           return ele;
         });
-      console.log(Res, 'RES');
       const userData = await fireStore()
         .collection('Users')
         .doc(Res.user.uid)
@@ -23,7 +21,6 @@ export const SinginCreater = (email, password) => {
         .then((snapShot) => {
           return snapShot.data();
         });
-        console.log(userData , "USSSSS DATAAAASSS")
       if (userData?.userName) {
         console.log("IF WOKR")
         await Auth()
